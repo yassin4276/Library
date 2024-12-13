@@ -35,3 +35,18 @@ type BookManagement() =
         books <- book :: books
         this.SaveBooksToFile()
 
+        // Borrow a book
+    member this.BorrowBook(title: string) =
+        match this.SearchBookByTitle(title) with
+        | [book] when book.IsAvailable() -> 
+            let success = book.Borrow()
+            if success then
+                this.SaveBooksToFile()
+                System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' borrowed successfully!") |> ignore
+            else
+                System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' is already borrowed.") |> ignore
+        | [book] -> 
+            System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' is already borrowed.") |> ignore
+        | _ -> 
+            System.Windows.Forms.MessageBox.Show("Book not fou
+
