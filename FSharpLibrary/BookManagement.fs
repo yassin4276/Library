@@ -55,6 +55,21 @@ type BookManagement() =
         books |> List.filter (fun book -> 
             book.Title.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
 
+             // Return a borrowed book
+    member this.ReturnBook(title: string) =
+        match this.SearchBookByTitle(title) with
+        | [book] when not (book.IsAvailable()) -> 
+            let success = book.Return()
+            if success then
+                this.SaveBooksToFile()
+                System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' returned successfully!") |> ignore
+            else
+                System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' is not borrowed.") |> ignore
+        | [book] -> 
+            System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' is not borrowed.") |> ignore
+        | _ -> 
+            System.Windows.Forms.MessageBox.Show("Book not found.") |> ignore
+
             
             
 
