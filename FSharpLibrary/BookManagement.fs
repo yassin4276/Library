@@ -48,24 +48,13 @@ type BookManagement() =
         | [book] -> 
             System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' is already borrowed.") |> ignore
         | _ -> 
-            System.Windows.Forms.MessageBox.Show("Book not fou
+            System.Windows.Forms.MessageBox.Show("Book not found.") |> ignore
 
-         // Display all books
-    member this.DisplayBooks() =
-        let booksInfo = 
-            books |> List.map (fun book -> 
-                $"{book.Title} by {book.Author} ({book.Genre}) - " + 
-                (if book.IsAvailable() then "Available" else "Borrowed"))
-            |> String.concat "\n"
-        System.Windows.Forms.MessageBox.Show(booksInfo) |> ignore
+           // Search a book by partial title (case-insensitive)
+    member this.SearchBookByTitle(searchTerm: string) =
+        books |> List.filter (fun book -> 
+            book.Title.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
 
-    // View all borrowed books
-    member this.ViewBorrowedBooks() =
-        let borrowedBooks = 
-            books |> List.filter (fun book -> not (book.IsAvailable()))
-                |> List.map (fun book -> $"{book.Title} by {book.Author} (Borrowed on {book.BorrowDate.Value})")
-                |> String.concat "\n"
-        if borrowedBooks <> "" then
-            System.Windows.Forms.MessageBox.Show($"Borrowed Books:\n{borrowedBooks}") |> ignore
-        else
-            System.Windows.Forms.MessageBox.Show("No books borrowed currently.") |> ignore
+            
+            
+
