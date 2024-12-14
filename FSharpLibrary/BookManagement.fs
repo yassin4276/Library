@@ -50,3 +50,22 @@ type BookManagement() =
         | _ -> 
             System.Windows.Forms.MessageBox.Show("Book not fou
 
+         // Display all books
+    member this.DisplayBooks() =
+        let booksInfo = 
+            books |> List.map (fun book -> 
+                $"{book.Title} by {book.Author} ({book.Genre}) - " + 
+                (if book.IsAvailable() then "Available" else "Borrowed"))
+            |> String.concat "\n"
+        System.Windows.Forms.MessageBox.Show(booksInfo) |> ignore
+
+    // View all borrowed books
+    member this.ViewBorrowedBooks() =
+        let borrowedBooks = 
+            books |> List.filter (fun book -> not (book.IsAvailable()))
+                |> List.map (fun book -> $"{book.Title} by {book.Author} (Borrowed on {book.BorrowDate.Value})")
+                |> String.concat "\n"
+        if borrowedBooks <> "" then
+            System.Windows.Forms.MessageBox.Show($"Borrowed Books:\n{borrowedBooks}") |> ignore
+        else
+            System.Windows.Forms.MessageBox.Show("No books borrowed currently.") |> ignore
