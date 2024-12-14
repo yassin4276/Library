@@ -17,3 +17,16 @@ type Book(title: string, author: string, genre: string) =
             true
         else
             false
+
+    // Method to return a book
+    member this.Return() =
+        if this.IsBorrowed then
+            this.IsBorrowed <- false
+            this.BorrowDate <- None
+            true
+        else
+            false
+
+    // Method to check the availability of the book
+    member this.IsAvailable() = not this.IsBorrowed
+
