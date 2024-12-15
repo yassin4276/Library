@@ -58,22 +58,24 @@ type BookManagement() =
         books |> List.filter (fun book -> 
             book.Title.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
 
-             // Return a borrowed book
+            // Return a borrowed book
     member this.ReturnBook(title: string) =
-        match this.SearchBookByTitle(title) with
-        | [book] when not (book.IsAvailable()) -> 
-            let success = book.Return()
-            if success then
-                this.SaveBooksToFile()
-                System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' returned successfully!") |> ignore
-            else
-                System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' is not borrowed.") |> ignore
-        | [book] -> 
-            System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' is not borrowed.") |> ignore
-        | _ -> 
+        let books = this.LoadBooksFromFile()
+        match books |> List.tryFind (fun book -> book.Title = title) with
+        | Some(book) when not (Book.IsAvailable(book)) -> 
+            let updatedBook = Book.Return(book)
+            match updatedBook with
+            | Some newBook -> 
+                this.SaveBooksToFile (books |> List.map (fun b -> if b = book then newBook else b))
+                System.Windows.Forms.MessageBox.Show($"Book '{newBook.Title}' returned successfully!") |> ignore
+            | None -> 
+                System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' was not borrowed.") |> ignore
+        | Some(_) -> 
+            System.Windows.Forms.MessageBox.Show($"Book '{title}' is not borrowed.") |> ignore
+        | None -> 
             System.Windows.Forms.MessageBox.Show("Book not found.") |> ignore
 
-            
+
      // Display all books
     member this.DisplayBooks() =
         let books = this.LoadBooksFromFile()
