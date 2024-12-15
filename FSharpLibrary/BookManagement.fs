@@ -36,21 +36,23 @@ type BookManagement() =
         let books = this.LoadBooksFromFile()
         this.SaveBooksToFile (book :: books)
         
-        // Borrow a book
+        // Borrow a book by title
     member this.BorrowBook(title: string) =
-        match this.SearchBookByTitle(title) with
-        | [book] when book.IsAvailable() -> 
-            let success = book.Borrow()
-            if success then
-                this.SaveBooksToFile()
-                System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' borrowed successfully!") |> ignore
-            else
+        let books = this.LoadBooksFromFile()
+        match books |> List.tryFind (fun book -> book.Title = title) with
+        | Some(book) when Book.IsAvailable(book) -> 
+            let updatedBook = Book.Borrow(book)
+            match updatedBook with
+            | Some newBook -> 
+                this.SaveBooksToFile (books |> List.map (fun b -> if b = book then newBook else b))
+                System.Windows.Forms.MessageBox.Show($"Book '{newBook.Title}' borrowed successfully!") |> ignore
+            | None -> 
                 System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' is already borrowed.") |> ignore
-        | [book] -> 
-            System.Windows.Forms.MessageBox.Show($"Book '{book.Title}' is already borrowed.") |> ignore
-        | _ -> 
+        | Some(_) -> 
+            System.Windows.Forms.MessageBox.Show($"Book '{title}' is already borrowed.") |> ignore
+        | None -> 
             System.Windows.Forms.MessageBox.Show("Book not found.") |> ignore
-
+            
            // Search a book by partial title (case-insensitive)
     member this.SearchBookByTitle(searchTerm: string) =
         books |> List.filter (fun book -> 
