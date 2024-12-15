@@ -9,15 +9,13 @@ type Book =
       IsBorrowed: bool
       BorrowDate: DateTime option }
 
-     // Method to borrow a book
-    member this.Borrow() =
-        if not this.IsBorrowed then
-            this.IsBorrowed <- true
-            this.BorrowDate <- Some(DateTime.Now)
-            true
+   // Create a new instance of Book with updated Borrowed status
+    static member Borrow(book: Book) =
+        if not book.IsBorrowed then
+            Some { book with IsBorrowed = true; BorrowDate = Some(DateTime.Now) }
         else
-            false
-
+            None
+            
     // Method to return a book
     member this.Return() =
         if this.IsBorrowed then
