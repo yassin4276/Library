@@ -71,12 +71,13 @@ type BookManagement() =
             System.Windows.Forms.MessageBox.Show("Book not found.") |> ignore
 
             
-        // Display all books
+     // Display all books
     member this.DisplayBooks() =
+        let books = this.LoadBooksFromFile()
         let booksInfo = 
             books |> List.map (fun book -> 
                 $"{book.Title} by {book.Author} ({book.Genre}) - " + 
-                (if book.IsAvailable() then "Available" else "Borrowed"))
+                (if Book.IsAvailable(book) then "Available" else "Borrowed"))
             |> String.concat "\n"
         System.Windows.Forms.MessageBox.Show(booksInfo) |> ignore
         
