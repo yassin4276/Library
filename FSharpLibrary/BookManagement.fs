@@ -35,13 +35,6 @@ type BookManagement() =
         books <- book :: books
         this.SaveBooksToFile()
 
-
-         // Search a book by partial title (case-insensitive)
-    member this.SearchBookByTitle(searchTerm: string) =
-        books |> List.filter (fun book -> 
-            book.Title.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
-            
-
         // Borrow a book
     member this.BorrowBook(title: string) =
         match this.SearchBookByTitle(title) with
@@ -86,15 +79,16 @@ type BookManagement() =
                 (if book.IsAvailable() then "Available" else "Borrowed"))
             |> String.concat "\n"
         System.Windows.Forms.MessageBox.Show(booksInfo) |> ignore
- // View all borrowed books
-    member this.ViewBorrowedBooks() =
-        let borrowedBooks = 
-            books |> List.filter (fun book -> not (book.IsAvailable()))
-                |> List.map (fun book -> $"{book.Title} by {book.Author} (Borrowed on {book.BorrowDate.Value})")
-                |> String.concat "\n"
-        if borrowedBooks <> "" then
-            System.Windows.Forms.MessageBox.Show($"Borrowed Books:\n{borrowedBooks}") |> ignore
-        else
-            System.Windows.Forms.MessageBox.Show("No books borrowed currently.") |> ignore
+        
+         // View all borrowed books
+            member this.ViewBorrowedBooks() =
+                let borrowedBooks = 
+                    books |> List.filter (fun book -> not (book.IsAvailable()))
+                        |> List.map (fun book -> $"{book.Title} by {book.Author} (Borrowed on {book.BorrowDate.Value})")
+                        |> String.concat "\n"
+                if borrowedBooks <> "" then
+                    System.Windows.Forms.MessageBox.Show($"Borrowed Books:\n{borrowedBooks}") |> ignore
+                else
+                    System.Windows.Forms.MessageBox.Show("No books borrowed currently.") |> ignore
 
 
