@@ -16,15 +16,14 @@ type Book =
         else
             None
             
-    // Method to return a book
-    member this.Return() =
-        if this.IsBorrowed then
-            this.IsBorrowed <- false
-            this.BorrowDate <- None
-            true
+   // Create a new instance of Book with updated Returned status
+    static member Return(book: Book) =
+        if book.IsBorrowed then
+            Some { book with IsBorrowed = false; BorrowDate = None }
         else
-            false
+            None
 
-    // Method to check the availability of the book
-    member this.IsAvailable() = not this.IsBorrowed
+    // Check if the book is available
+    static member IsAvailable(book: Book) = 
+        not book.IsBorrowed
 
