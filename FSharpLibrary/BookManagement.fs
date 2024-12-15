@@ -6,35 +6,36 @@ open Newtonsoft.Json
 open Library
 
 type BookManagement() =
-    let mutable books = []
-
     let filePath = "books.json"
 
-    // Save books to file
-    member this.SaveBooksToFile() =
+    // Helper to read books from file
+    member this.LoadBooksFromFile () =
+        try
+            if File.Exists(filePath) then
+                let json = File.ReadAllText(filePath)
+                JsonConvert.DeserializeObject<Book list>(json)
+            else
+                []  // Return an empty list if the file doesn't exist
+        with
+        | ex -> 
+            System.Windows.Forms.MessageBox.Show($"Error loading books: {ex.Message}") |> ignore
+            []  // Return an empty list on error
+
+    // Helper to save books to file
+    member this.SaveBooksToFile (books: Book list) =
         try
             let json = JsonConvert.SerializeObject(books, Formatting.Indented)
             File.WriteAllText(filePath, json)
         with
-        | ex -> System.Windows.Forms.MessageBox.Show($"Error saving books: {ex.Message}") |> ignore
+        | ex -> 
+            System.Windows.Forms.MessageBox.Show($"Error saving books: {ex.Message}") |> ignore
 
-    // Load books from file
-    member this.LoadBooksFromFile() =
-        try
-            if File.Exists(filePath) then
-                let json = File.ReadAllText(filePath)
-                books <- JsonConvert.DeserializeObject<Book list>(json)
-            else
-                System.Windows.Forms.MessageBox.Show("No saved data found, starting with an empty library.") |> ignore
-        with
-        | ex -> System.Windows.Forms.MessageBox.Show($"Error loading books: {ex.Message}") |> ignore
-
-    // Add a new book
+    // Add a new book to the collection
     member this.AddBook(title: string, author: string, genre: string) =
-        let book = new Book(title, author, genre)
-        books <- book :: books
-        this.SaveBooksToFile()
-
+        let book = { Title = title; Author = author; Genre = genre; IsBorrowed = false; BorrowDate = None }
+        let books = this.LoadBooksFromFile()
+        this.SaveBooksToFile (book :: books)
+        
         // Borrow a book
     member this.BorrowBook(title: string) =
         match this.SearchBookByTitle(title) with
