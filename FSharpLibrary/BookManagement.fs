@@ -35,6 +35,13 @@ type BookManagement() =
         books <- book :: books
         this.SaveBooksToFile()
 
+
+         // Search a book by partial title (case-insensitive)
+    member this.SearchBookByTitle(searchTerm: string) =
+        books |> List.filter (fun book -> 
+            book.Title.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+            
+
         // Borrow a book
     member this.BorrowBook(title: string) =
         match this.SearchBookByTitle(title) with
