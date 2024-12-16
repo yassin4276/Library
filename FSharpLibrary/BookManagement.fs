@@ -53,8 +53,9 @@ type BookManagement() =
         | None -> 
             System.Windows.Forms.MessageBox.Show("Book not found.") |> ignore
             
-           // Search a book by partial title (case-insensitive)
+           // Search for a book by title
     member this.SearchBookByTitle(searchTerm: string) =
+        let books = this.LoadBooksFromFile()
         books |> List.filter (fun book -> 
             book.Title.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
 
